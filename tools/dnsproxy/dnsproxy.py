@@ -190,7 +190,6 @@ class DNSProxyServer(ThreadingUDPServer):
     def __init__(self, dns_server, disable_cache=False, host='127.0.0.1', port=53, hosts_file='/etc/hosts'):
         self.dns_server = dns_server
         self.hosts_file = hosts_file
-        self.host_lines = load_hosts(hosts_file)
         self.disable_cache = disable_cache
         self.cache = {}
         ThreadingUDPServer.__init__(self, (host, port), DNSProxyHandler)

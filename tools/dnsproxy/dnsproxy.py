@@ -106,8 +106,12 @@ class DNSProxyHandler(BaseRequestHandler):
         reqdata, sock = self.request
         req = parse_dns_message(reqdata)
         q = req.question
+
+        hosts_file = self.server.hosts_file
+        host_lines = load_hosts(hosts_file)
+
         if q.type_ in (DNS_TYPE_A, DNS_TYPE_AAAA) and (q.class_ == DNS_CLASS_IN):
-            for packed_ip, host in self.server.host_lines:
+            for packed_ip, host in host_lines:
                 if q.name.endswith(host):
                     # header, qd=1, an=1, ns=0, ar=0
                     rspdata = reqdata[:2] + '\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00'
@@ -168,7 +172,7 @@ def load_hosts(hosts_file):
     def wildcard_line(line):
         parts = line.strip().split()[:2]
         if len(parts) < 2: return False
-        if not parts[1].startswith('*'): return False
+        # if not parts[1].startswith('*'): return False
         try:
             packed_ip = addr_p2n(parts[0])
             return packed_ip, parts[1][1:]
